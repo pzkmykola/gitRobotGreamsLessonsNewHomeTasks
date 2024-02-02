@@ -14,9 +14,9 @@ class ApiClient {
             .client(httpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .baseUrl("https://rickandmortyapi.com/")  //final solution
+            //.baseUrl("https://rickandmortyapi.com/")  //final solution
             //.baseUrl("https://api.imgflip.com/") // this works
- ////       .baseUrl(/* baseUrl = */ "https://akabab.github.io/") //this doesn't work
+            .baseUrl(/* baseUrl = */ "https://akabab.github.io") //this works too!!!
             .build()
     }
 }
