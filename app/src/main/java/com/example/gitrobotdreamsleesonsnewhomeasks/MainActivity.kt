@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,25 +17,47 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val recyclerView:RecyclerView = findViewById(R.id.recyclerView)
         val api = ApiClient.client.create(ApiInterface::class.java)
-        api.getSuperHeroes()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({
-                  if(it.data.memes != null){
-                      val items = it.data.memes
-                      val myAdapter = SuperheroViewAdapter(items as MutableList<SuperHero>){
-                          Toast.makeText(this, "${it} clicked", Toast.LENGTH_SHORT).show()
-                      }
-                      recyclerView.adapter =myAdapter
-                  }
-            },{
-                Toast.makeText(this, "Fetch error ${it.message}",Toast.LENGTH_SHORT).show()
-            })
+//        api.getSuperHeroes()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe ({
+//                if(it.data != null){
+//                    val items = it.data
+////                if(it.data.superheroes != null){
+////                    val items = it.data.superheroes
+//                      val myAdapter = SuperheroViewAdapter(items as MutableList<SuperHero>){
+//                          Toast.makeText(this, "$it clicked", Toast.LENGTH_LONG).show() }
+//                    recyclerView.adapter = myAdapter
+//                }
+//            }) {
+//                Toast.makeText(
+//                    this,
+//                    "Fetch error ${it.message} on response[${it}]",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+        //==================================================
+        api.getSuperHeroes().enqueue(object : Callback<SuperHeroDataResponse> {
+            override fun onResponse(
+                call: Call<SuperHeroDataResponse>,
+                response: Response<SuperHeroDataResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val items = response.body()?.data
+                    val myAdapter = SuperheroViewAdapter(items as MutableList<SuperHero>) {
+                        Toast.makeText(this@MainActivity, "$items clicked", Toast.LENGTH_LONG)
+                            .show()
+                    }
+                    recyclerView.adapter = myAdapter
+                }
+            }
 
+            override fun onFailure(call: Call<SuperHeroDataResponse>, t: Throwable) {
+                Toast.makeText(this@MainActivity, "Error $(t.message}", Toast.LENGTH_LONG)
+                    .show()
+            }
+        })
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
 }
 
-data class SuperHeroDataResponse(val data:Data)
-data class Data(val memes:List<SuperHero>)
-class SuperHero(val name:String, val url:String)
