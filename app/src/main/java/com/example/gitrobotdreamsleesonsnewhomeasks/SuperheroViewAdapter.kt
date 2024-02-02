@@ -20,7 +20,6 @@ class SuperheroViewAdapter(private val items:MutableList<SuperHero>, val onClick
             .into(holder.image)
         val onClick:String = items[position].name.toString()
         holder.itemView.setOnClickListener { onClick(onClick)}
-        //holder.itemView.setOnClickListener { onClick(items[position].name)}
     }
 }
 
