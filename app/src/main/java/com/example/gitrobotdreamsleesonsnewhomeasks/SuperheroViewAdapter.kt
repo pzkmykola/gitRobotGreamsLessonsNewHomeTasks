@@ -15,11 +15,11 @@ class SuperheroViewAdapter(private val items:MutableList<SuperHero>, val onClick
 
     override fun onBindViewHolder(holder: SuperheroViewHolder, position: Int) {
         holder.title.text = items[position].name
-        val load = Glide.with(holder.itemView.context)
+        Glide.with(holder.itemView.context)
             .load(items[position].images.url)//solution for 'akabab.github.io' api
             //.load(items[position].url) //solution for 'imgflip.com' api
             .into(holder.image)
-        val onClick:String = items[position].name.toString()
+        val onClick:String = items[position].name
         holder.itemView.setOnClickListener { onClick(onClick)}
     }
 }
