@@ -3,42 +3,57 @@ package com.example.gitrobotdreamsleesonsnewhomeasks
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
 
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val recyclerView:RecyclerView = findViewById(R.id.recyclerView)
-        val api = ApiClient.client.create(ApiInterface::class.java)
+        val fabAdd: FloatingActionButton = findViewById(R.id.fabButtonAdd)
+        val fabRemove: FloatingActionButton = findViewById(R.id.fabButtonRemove)
+        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        val viewModel = ViewModelProvider(this)[MyViewModel::class.java]
 
-        api.getSuperHeroes()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe ({
-                if(it!= null){
-                    val items = it
-                      val myAdapter = SuperheroViewAdapter(items as MutableList<SuperHero>){
-                          Toast.makeText(this, buildString {
-                                    append(it)
-                                    append(" clicked now")
-                                },
-                              Toast.LENGTH_LONG).show() }
+        fabAdd.setOnClickListener {
+            viewModel.getData()
+
+        }
+
+        fabRemove.setOnClickListener {
+            viewModel.removeData()
+        }
+
+        viewModel.uiState.observe(this) {
+            when (it) {
+                is MyViewModel.UIState.Empty -> {
+                    Toast.makeText(this, "List isEmpty. Click '+' button!", Toast.LENGTH_LONG).show()
+                }
+
+                is MyViewModel.UIState.Processing -> {
+                    Toast.makeText(this, "Processing... .'-' button?", Toast.LENGTH_SHORT).show()
+                }
+
+                is MyViewModel.UIState.Result -> {
+                    val myAdapter = SuperheroViewAdapter(it.list as MutableList<SuperHero>) {}
                     recyclerView.adapter = myAdapter
                 }
-            }) {
-                Toast.makeText(
-                    this,
-                    "Fetch error ${it.message} on response]",
-                    Toast.LENGTH_LONG
-                ).show()
+
+                is MyViewModel.UIState.Clean -> {
+                    val emptyList = mutableListOf<SuperHero>()
+                    val myAdapter = SuperheroViewAdapter(emptyList) {}
+                    recyclerView.adapter = myAdapter
+                }
             }
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        }
     }
 }
+
 

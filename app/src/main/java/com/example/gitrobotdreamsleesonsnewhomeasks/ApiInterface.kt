@@ -6,7 +6,5 @@ import retrofit2.http.GET
 
 interface ApiInterface {
      @GET("/superhero-api/api/all.json")
-     fun getSuperHeroes():Single<SuperHeroDataResponse>
-//   // final solution
-//  fun getSuperHeroes():Call<SuperHeroDataResponse>   // final solution
+     suspend fun getSuperHeroesByCR():SuperHeroDataResponse
 }
