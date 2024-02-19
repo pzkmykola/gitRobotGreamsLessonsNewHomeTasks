@@ -1,9 +1,8 @@
 package com.example.gitrobotdreamsleesonsnewhomeasks
 
 import com.google.gson.annotations.SerializedName
-import java.lang.invoke.MethodHandleInfo
 
-/*Below are data classes for 'akabab.github.io' site*/
+
 typealias SuperHeroDataResponse = List<SuperHero>;
 
 data class SuperHero(
