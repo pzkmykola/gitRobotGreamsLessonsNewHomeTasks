@@ -2,7 +2,6 @@ package com.example.gitrobotdreamsleesonsnewhomeasks
 
 import android.app.Application
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class MyApplication : Application() {
     lateinit var repo: Repository
@@ -12,10 +11,7 @@ class MyApplication : Application() {
         repo = Repository(getApiClient())
     }
     private fun getApiClient(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(/* baseUrl = */ "https://akabab.github.io")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        return ApiClient().client
     }
     companion object {
         private lateinit var instance: MyApplication
