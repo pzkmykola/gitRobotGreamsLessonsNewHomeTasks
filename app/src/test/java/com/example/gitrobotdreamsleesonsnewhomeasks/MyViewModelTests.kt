@@ -70,4 +70,34 @@ class MyViewModelTests {
         val uiState = eventList[2] as MyViewModel.UIState.Result
         Assert.assertEquals(1, uiState.list.size)
     }
+
+    @Test
+    fun checkRemoveData() {
+        val repository = Mockito.mock(Repository::class.java)
+        var currentResponseExample = emptyList<SuperHero>()
+        currentResponseExample = listOf(DataExample)
+        val viewModel = MyViewModel(repository)
+        val eventList = mutableListOf<MyViewModel.UIState>()
+        viewModel.uiState.observeForever {
+            eventList.add(it)
+        }
+        runBlocking(Dispatchers.IO) {
+            Mockito.`when`(repository.getSuperHeroesByCR()).thenReturn(currentResponseExample as SuperHeroDataResponse)
+        }
+        viewModel.getData()
+
+        Assert.assertEquals(MyViewModel.UIState.Empty,eventList[0])
+        Assert.assertEquals(MyViewModel.UIState.Processing,eventList[1])
+        runBlocking(Dispatchers.IO) {
+            delay(100)
+        }
+        var uiState = eventList[2] as MyViewModel.UIState.Result
+        Assert.assertEquals(1, uiState.list.size)
+
+        viewModel.removeData()
+        val newUiState = eventList[3] as MyViewModel.UIState.Clean
+        uiState = eventList[4] as MyViewModel.UIState.Result
+        Assert.assertEquals(MyViewModel.UIState.Clean,eventList[3])
+        Assert.assertEquals(0, uiState.list.size)
+    }
 }
